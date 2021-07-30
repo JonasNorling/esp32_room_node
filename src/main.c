@@ -6,6 +6,7 @@ LOG_MODULE_REGISTER(main);
 
 const struct device *l_gpio1 = NULL;
 const struct device *l_dht22 = NULL;
+const struct device *l_bmp280 = NULL;
 
 #define GPIO_PIN_LED 13
 
@@ -35,6 +36,12 @@ static int sensor_init()
         LOG_ERR("Failed to open DHT22");
         return 1;
     }
+
+    l_bmp280 = device_get_binding(DT_LABEL(DT_INST(0, bosch_bme280)));
+    if (!l_bmp280) {
+        LOG_ERR("Failed to open BMP280");
+        return 1;
+    }
     return 0;
 }
 
@@ -57,10 +64,15 @@ int main(int argc, char **argv)
         gpio_pin_set(l_gpio1, GPIO_PIN_LED, 0);
 
         if (sensor_sample_fetch(l_dht22)) {
-            LOG_ERR("Failed to fetch sample");
+            LOG_ERR("Failed to fetch DHT22 sample");
+        }
+
+        if (sensor_sample_fetch(l_bmp280)) {
+            LOG_ERR("Failed to fetch BMP280 sample");
         }
 
         struct sensor_value temp;
+        struct sensor_value pres;
         struct sensor_value rh;
         if (sensor_channel_get(l_dht22, SENSOR_CHAN_AMBIENT_TEMP, &temp)) {
             LOG_ERR("Failed to read temperature");
@@ -69,8 +81,21 @@ int main(int argc, char **argv)
             LOG_ERR("Failed to read humitidy");
         }
 
-        LOG_INF("Temp: %d.%06d, RH: %d.%06d",
+        LOG_INF("DHT22 temp: %d.%06d, RH: %d.%06d",
                 temp.val1, temp.val2, rh.val1, rh.val2);
+
+        if (sensor_channel_get(l_bmp280, SENSOR_CHAN_AMBIENT_TEMP, &temp)) {
+            LOG_ERR("Failed to read temperature");
+        }
+        if (sensor_channel_get(l_bmp280, SENSOR_CHAN_HUMIDITY, &rh)) {
+            LOG_ERR("Failed to read humitidy");
+        }
+        if (sensor_channel_get(l_bmp280, SENSOR_CHAN_PRESS, &rh)) {
+            LOG_ERR("Failed to read pressure");
+        }
+
+        LOG_INF("BMP280 temp: %d.%06d, pres: %d.%06d, RH: %d.%06d",
+                temp.val1, temp.val2, pres.val1, pres.val2, rh.val1, rh.val2);
     }
 
     return 0;

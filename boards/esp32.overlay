@@ -7,3 +7,16 @@
 		dht22;
 	};
 };
+
+&i2c0 {
+    sda-pin = <23>;
+	scl-pin = <22>;
+    clock-frequency = <I2C_BITRATE_STANDARD>;
+
+    bmp280@77 {
+        compatible = "bosch,bme280";
+        status = "okay";
+        label = "BMP280";
+        reg = <0x77>;
+    };
+};
