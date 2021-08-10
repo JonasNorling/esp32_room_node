@@ -84,13 +84,16 @@ int main(int argc, char **argv)
         LOG_INF("DHT22 temp: %d.%06d, RH: %d.%06d",
                 temp.val1, temp.val2, rh.val1, rh.val2);
 
+        memset(&temp, 0, sizeof(temp));
+        memset(&rh, 0, sizeof(rh));
+        memset(&pres, 0, sizeof(pres));
         if (sensor_channel_get(l_bmp280, SENSOR_CHAN_AMBIENT_TEMP, &temp)) {
             LOG_ERR("Failed to read temperature");
         }
         if (sensor_channel_get(l_bmp280, SENSOR_CHAN_HUMIDITY, &rh)) {
             LOG_ERR("Failed to read humitidy");
         }
-        if (sensor_channel_get(l_bmp280, SENSOR_CHAN_PRESS, &rh)) {
+        if (sensor_channel_get(l_bmp280, SENSOR_CHAN_PRESS, &pres)) {
             LOG_ERR("Failed to read pressure");
         }
 

@@ -8,15 +8,19 @@
 	};
 };
 
-&i2c0 {
-    sda-pin = <23>;
-	scl-pin = <22>;
-    clock-frequency = <I2C_BITRATE_STANDARD>;
+&spi3 {
+    miso-pin = <19>;
+	mosi-pin = <18>;
+	sclk-pin = <5>;
+	csel-pin = <15>;
 
-    bmp280@77 {
+    cs-gpios = <&gpio0 15 GPIO_ACTIVE_LOW>;
+
+    bme280@0 {
         compatible = "bosch,bme280";
         status = "okay";
-        label = "BMP280";
-        reg = <0x77>;
+        label = "BME280";
+        reg = <0>;
+        spi-max-frequency = <1000000>;
     };
 };
