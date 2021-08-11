@@ -39,34 +39,25 @@ static int display_init()
         return 1;
     }
 
-    static uint16_t buffer[256 * 8];
+    static uint16_t buffer[256 * 1];
     memset(buffer, 0x55, sizeof(buffer));
     struct display_buffer_descriptor buf_desc = {
         .buf_size = sizeof(buffer),
         .pitch = 256,
-        .width = 160,
-        .height = 8,
+        .width = 40,
+        .height = 1,
     };
-    if (display_write(l_display, 0, 0, &buf_desc, buffer)) {
-        LOG_ERR("Display write failed");
-        return 1;
-    }
     if (display_blanking_off(l_display)) {
         LOG_ERR("Display unblank failed");
         return 1;
     }
 
-    while (true) {
-        k_sleep(K_MSEC(500));
-        memset(buffer, 0x00, sizeof(buffer));
-        if (display_write(l_display, 0, 0, &buf_desc, buffer)) {
-            LOG_ERR("Display write failed");
-            return 1;
-        }
-
-        k_sleep(K_MSEC(500));
+    for (int i = 0; i < 80; i++) {
+        k_sleep(K_MSEC(100));
         memset(buffer, 0xff, sizeof(buffer));
-        if (display_write(l_display, 0, 0, &buf_desc, buffer)) {
+        buffer[0] = i;
+        buffer[i] = 0x0000;
+        if (display_write(l_display, 0, i, &buf_desc, buffer)) {
             LOG_ERR("Display write failed");
             return 1;
         }
