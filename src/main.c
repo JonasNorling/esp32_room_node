@@ -2,6 +2,7 @@
 #include <drivers/gpio.h>
 #include <drivers/sensor.h>
 #include <drivers/display.h>
+#include <sys/byteorder.h>
 
 LOG_MODULE_REGISTER(main);
 
@@ -39,28 +40,66 @@ static int display_init()
         return 1;
     }
 
-    static uint16_t buffer[256 * 1];
-    memset(buffer, 0x55, sizeof(buffer));
-    struct display_buffer_descriptor buf_desc = {
-        .buf_size = sizeof(buffer),
-        .pitch = 256,
-        .width = 40,
-        .height = 1,
-    };
     if (display_blanking_off(l_display)) {
         LOG_ERR("Display unblank failed");
         return 1;
     }
 
-    for (int i = 0; i < 80; i++) {
-        k_sleep(K_MSEC(100));
-        memset(buffer, 0xff, sizeof(buffer));
-        buffer[0] = i;
-        buffer[i] = 0x0000;
-        if (display_write(l_display, 0, i, &buf_desc, buffer)) {
-            LOG_ERR("Display write failed");
-            return 1;
+    struct display_capabilities caps;
+    display_get_capabilities(l_display, &caps);
+    LOG_INF("Pixel format: %d", caps.current_pixel_format);
+
+    return 0;
+}
+
+static int display_show(int call)
+{
+    #define PITCH 256
+    #define W 160
+    #define H 80
+
+    static uint16_t buffer[PITCH * H];
+    memset(buffer, 0x00, sizeof(buffer));
+    for (int y = 0; y < H; y += 16) {
+        for (int x = 0; x < W; x++) {
+            buffer[y * PITCH + x] = 0xffff;
         }
+    }
+
+    for (int y = 0; y < H; y++) {
+        for (int x = 0; x < W; x += 16) {
+            buffer[y * PITCH + x] = 0xffff;
+        }
+    }
+
+    for (int y = 0; y < 16; y++) {
+        for (int x = 0; x < 16; x++) {
+            buffer[y * PITCH + x] = sys_cpu_to_be16(0x001f);
+        }
+    }
+
+    for (int y = 17; y < 32; y++) {
+        for (int x = 0; x < 16; x++) {
+            buffer[y * PITCH + x] = sys_cpu_to_be16(0x07e0);
+        }
+    }
+
+    for (int y = 33; y < 48; y++) {
+        for (int x = 0; x < 16; x++) {
+            buffer[y * PITCH + x] = sys_cpu_to_be16(0xf800);
+        }
+    }
+
+    struct display_buffer_descriptor buf_desc = {
+        .buf_size = sizeof(buffer),
+        .pitch = PITCH,
+        .width = 40,
+        .height = H,
+    };
+
+    if (display_write(l_display, 0, 0, &buf_desc, buffer)) {
+        LOG_ERR("Display write failed");
+        return 1;
     }
 
     return 0;
@@ -93,7 +132,13 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    int call = 0;
     while (true) {
+        if (display_show(call)) {
+            return 1;
+        }
+        call++;
+
         k_sleep(K_MSEC(2000));
         gpio_pin_set(l_gpio1, GPIO_PIN_LED, 1);
         k_sleep(K_MSEC(100));
