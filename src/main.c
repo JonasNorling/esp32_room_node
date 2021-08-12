@@ -90,10 +90,22 @@ static int display_show(int call)
         }
     }
 
+    for (int y = 49; y < 64; y++) {
+        for (int x = 0; x < 16; x++) {
+            buffer[y * PITCH + x] = sys_cpu_to_be16(call);
+        }
+    }
+
+    for (int y = 0; y < call % H; y++) {
+        for (int x = 17; x < 32; x++) {
+            buffer[y * PITCH + x] = sys_cpu_to_be16(0x07e0);
+        }
+    }
+
     struct display_buffer_descriptor buf_desc = {
         .buf_size = sizeof(buffer),
         .pitch = PITCH,
-        .width = 40,
+        .width = W,
         .height = H,
     };
 
@@ -139,7 +151,7 @@ int main(int argc, char **argv)
         }
         call++;
 
-        k_sleep(K_MSEC(2000));
+        k_sleep(K_MSEC(1000));
         gpio_pin_set(l_gpio1, GPIO_PIN_LED, 1);
         k_sleep(K_MSEC(100));
         gpio_pin_set(l_gpio1, GPIO_PIN_LED, 0);
