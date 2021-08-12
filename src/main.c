@@ -3,6 +3,7 @@
 #include <drivers/sensor.h>
 #include <drivers/display.h>
 #include <sys/byteorder.h>
+#include <lvgl.h>
 
 LOG_MODULE_REGISTER(main);
 
@@ -54,66 +55,11 @@ static int display_init()
 
 static int display_show(int call)
 {
-    #define PITCH 256
-    #define W 160
-    #define H 80
-
-    static uint16_t buffer[PITCH * H];
-    memset(buffer, 0x00, sizeof(buffer));
-    for (int y = 0; y < H; y += 16) {
-        for (int x = 0; x < W; x++) {
-            buffer[y * PITCH + x] = 0xffff;
-        }
-    }
-
-    for (int y = 0; y < H; y++) {
-        for (int x = 0; x < W; x += 16) {
-            buffer[y * PITCH + x] = 0xffff;
-        }
-    }
-
-    for (int y = 0; y < 16; y++) {
-        for (int x = 0; x < 16; x++) {
-            buffer[y * PITCH + x] = sys_cpu_to_be16(0x001f);
-        }
-    }
-
-    for (int y = 17; y < 32; y++) {
-        for (int x = 0; x < 16; x++) {
-            buffer[y * PITCH + x] = sys_cpu_to_be16(0x07e0);
-        }
-    }
-
-    for (int y = 33; y < 48; y++) {
-        for (int x = 0; x < 16; x++) {
-            buffer[y * PITCH + x] = sys_cpu_to_be16(0xf800);
-        }
-    }
-
-    for (int y = 49; y < 64; y++) {
-        for (int x = 0; x < 16; x++) {
-            buffer[y * PITCH + x] = sys_cpu_to_be16(call);
-        }
-    }
-
-    for (int y = 0; y < call % H; y++) {
-        for (int x = 17; x < 32; x++) {
-            buffer[y * PITCH + x] = sys_cpu_to_be16(0x07e0);
-        }
-    }
-
-    struct display_buffer_descriptor buf_desc = {
-        .buf_size = sizeof(buffer),
-        .pitch = PITCH,
-        .width = W,
-        .height = H,
-    };
-
-    if (display_write(l_display, 0, 0, &buf_desc, buffer)) {
-        LOG_ERR("Display write failed");
-        return 1;
-    }
-
+    lv_obj_t *hello_world_label;
+    hello_world_label = lv_label_create(lv_scr_act(), NULL);
+    lv_label_set_text(hello_world_label, "Hello world!");
+	lv_obj_align(hello_world_label, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_task_handler();
     return 0;
 }
 
