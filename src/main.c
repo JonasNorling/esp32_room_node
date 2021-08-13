@@ -25,6 +25,7 @@ static lv_style_t l_lv_value_style;
 
 #define GPIO_PIN_LED 13
 #define GPIO_PIN_SERVO 27
+#define PWM_CHANNEL GPIO_PIN_SERVO
 
 static int gpio_init()
 {
@@ -133,16 +134,6 @@ static int sensor_init()
 
 static int pwm_init()
 {
-    // High speed PWM channel 3 = GPIO 27
-    int rc;
-    /*
-    int rc = gpio_pin_configure(l_gpio1, GPIO_PIN_SERVO, GPIO_OUTPUT_LOW);
-    if (rc) {
-        LOG_ERR("Error configuring pin");
-        return 1;
-    }
-    */
-
     l_pwm = device_get_binding(CONFIG_PWM_LED_ESP32_DEV_NAME_0);
     if (!l_pwm) {
         LOG_ERR("Failed to open PWM device");
@@ -150,14 +141,21 @@ static int pwm_init()
     }
 
     uint64_t cycles = 0;
-    rc = pwm_get_cycles_per_sec(l_pwm, 3, &cycles);
+    int rc = pwm_get_cycles_per_sec(l_pwm, PWM_CHANNEL, &cycles);
     if (rc) {
         LOG_ERR("Failed to get PWM cycles");
         return 1;
     }
     LOG_INF("PWM cycles %lld", cycles);
 
-    rc = pwm_pin_set_usec(l_pwm, 3, 0, 1, 0);
+    return 0;
+}
+
+static int servo_set(float duty_ms)
+{
+    float duty = duty_ms * ((float)CONFIG_PWM_LED_ESP32_HS_TIMER0_FREQ / 1000);
+    int period = (1 << CONFIG_PWM_LED_ESP32_HS_TIMER0_BIT_NUM) * duty;
+    int rc = pwm_pin_set_cycles(l_pwm, PWM_CHANNEL, 0, period, 0);
     if (rc) {
         LOG_ERR("Failed to set PWM");
         return 1;
@@ -183,6 +181,10 @@ int main(int argc, char **argv)
     }
 
     if (pwm_init()) {
+        return 1;
+    }
+
+    if (servo_set(1.0)) {
         return 1;
     }
 
