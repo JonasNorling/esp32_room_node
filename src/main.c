@@ -111,10 +111,10 @@ static int display_update(int call, float temp, float rh)
     snprintf(buffer, sizeof(buffer), "Hello %d", call);
     lv_label_set_text(l_lv_hello_world, buffer);
 
-    snprintf(buffer, sizeof(buffer), "%dC", (int)(temp + 0.5));
+    snprintf(buffer, sizeof(buffer), "%.1fC", temp);
     lv_label_set_text(l_lv_temp, buffer);
 
-    snprintf(buffer, sizeof(buffer), "%d%%", (int)(rh + 0.5));
+    snprintf(buffer, sizeof(buffer), "%.1f%%", rh);
     lv_label_set_text(l_lv_rh, buffer);
 
     lv_task_handler();
@@ -184,11 +184,8 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    if (servo_set(1.0)) {
-        return 1;
-    }
-
     int call = 0;
+    float servo_duty = 0.0f;
     while (true) {
         k_sleep(K_MSEC(1000));
         gpio_pin_set(l_gpio1, GPIO_PIN_LED, 1);
@@ -208,8 +205,9 @@ int main(int argc, char **argv)
             LOG_ERR("Failed to read humitidy");
         }
 
-        LOG_INF("DHT22 temp: %d.%06d, RH: %d.%06d",
-                temp.val1, temp.val2, rh.val1, rh.val2);
+        LOG_INF("DHT22 temp: %.1f, RH: %.1f",
+                sensor_value_to_double(&temp),
+                sensor_value_to_double(&rh));
 
         if (display_update(call,
                            sensor_value_to_double(&temp),
@@ -217,6 +215,23 @@ int main(int argc, char **argv)
             return 1;
         }
         call++;
+
+        if (temp.val1 >= 27) {
+            if (servo_duty != 2.0f) {
+                servo_duty = 2.0f;
+                if (servo_set(servo_duty)) {
+                    return 1;
+                }
+            }
+        }
+        if (temp.val1 < 27) {
+            if (servo_duty != 1.0f) {
+                servo_duty = 1.0f;
+                if (servo_set(servo_duty)) {
+                    return 1;
+                }
+            }
+        }
     }
 
     return 0;
