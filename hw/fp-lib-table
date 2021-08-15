@@ -3,4 +3,5 @@
   (lib (name Module)(type KiCad)(uri ${KIPRJMOD}/Module.pretty)(options "")(descr ""))
   (lib (name "LCD Display")(type KiCad)(uri "${KIPRJMOD}/LCD Display.pretty")(options "")(descr ""))
   (lib (name elemental)(type KiCad)(uri ${KIPRJMOD}/elemental.pretty)(options "")(descr ""))
+  (lib (name "Prototype area")(type KiCad)(uri "${KIPRJMOD}/Prototype area.pretty")(options "")(descr ""))
 )

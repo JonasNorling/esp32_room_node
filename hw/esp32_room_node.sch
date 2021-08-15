@@ -732,17 +732,6 @@ F 3 "~" H 9850 2200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Mechanical:MountingHole H2
-U 1 1 611927CE
-P 9850 2400
-F 0 "H2" H 9950 2446 50  0000 L CNN
-F 1 "MountingHole" H 9950 2355 50  0000 L CNN
-F 2 "MountingHole:MountingHole_2.5mm" H 9850 2400 50  0001 C CNN
-F 3 "~" H 9850 2400 50  0001 C CNN
-	1    9850 2400
-	1    0    0    -1  
-$EndComp
-$Comp
 L Graphic:Logo_Open_Hardware_Small LOGO1
 U 1 1 61197769
 P 9900 3250
@@ -933,10 +922,10 @@ F 3 "" H 1750 3300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector:TestPoint TP?
+L Connector:TestPoint TP12
 U 1 1 6120AC9D
 P 1750 3700
-F 0 "TP?" H 1808 3818 50  0000 L CNN
+F 0 "TP12" H 1808 3818 50  0000 L CNN
 F 1 "TestPoint" H 1808 3727 50  0000 L CNN
 F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 1950 3700 50  0001 C CNN
 F 3 "~" H 1950 3700 50  0001 C CNN
@@ -944,10 +933,10 @@ F 3 "~" H 1950 3700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0128
 U 1 1 6120B0E9
 P 1750 3700
-F 0 "#PWR?" H 1750 3450 50  0001 C CNN
+F 0 "#PWR0128" H 1750 3450 50  0001 C CNN
 F 1 "GND" H 1755 3527 50  0000 C CNN
 F 2 "" H 1750 3700 50  0001 C CNN
 F 3 "" H 1750 3700 50  0001 C CNN
@@ -955,10 +944,10 @@ F 3 "" H 1750 3700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector:TestPoint TP?
+L Connector:TestPoint TP11
 U 1 1 6120D9C2
 P 1450 3700
-F 0 "TP?" H 1508 3818 50  0000 L CNN
+F 0 "TP11" H 1508 3818 50  0000 L CNN
 F 1 "TestPoint" H 1508 3727 50  0000 L CNN
 F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 1650 3700 50  0001 C CNN
 F 3 "~" H 1650 3700 50  0001 C CNN
@@ -966,14 +955,25 @@ F 3 "~" H 1650 3700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0129
 U 1 1 6120DE28
 P 1450 3700
-F 0 "#PWR?" H 1450 3450 50  0001 C CNN
+F 0 "#PWR0129" H 1450 3450 50  0001 C CNN
 F 1 "GND" H 1455 3527 50  0000 C CNN
 F 2 "" H 1450 3700 50  0001 C CNN
 F 3 "" H 1450 3700 50  0001 C CNN
 	1    1450 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L Graphic:Logo_Open_Hardware_Small PROTOAREA1
+U 1 1 612C280E
+P 9900 2750
+F 0 "PROTOAREA1" H 9900 3025 50  0001 C CNN
+F 1 "Logo_Open_Hardware_Small" H 9900 2525 50  0001 C CNN
+F 2 "Prototype area:protoarea" H 9900 2750 50  0001 C CNN
+F 3 "~" H 9900 2750 50  0001 C CNN
+	1    9900 2750
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC
