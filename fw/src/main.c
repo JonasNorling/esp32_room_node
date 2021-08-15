@@ -17,14 +17,20 @@ const struct device *l_display = NULL;
 const struct device *l_pwm = NULL;
 const struct device *l_counter = NULL;
 
+static bool l_encoder_pressed;
+static int l_encoder_position;
+
 static lv_obj_t *l_lv_hello_world;
 static lv_obj_t *l_lv_temp;
 static lv_obj_t *l_lv_rh;
 static lv_obj_t *l_lv_temp_label;
 static lv_obj_t *l_lv_rh_label;
+static lv_obj_t *l_lv_button1;
+static lv_obj_t *l_lv_button2;
 static lv_style_t l_lv_default_style;
 static lv_style_t l_lv_tiny_style;
 static lv_style_t l_lv_value_style;
+static lv_group_t *l_lv_group;
 
 #define GPIO_PIN_LED 13
 #define GPIO_PIN_SERVO 27
@@ -79,6 +85,9 @@ static int display_init()
     lv_style_init(&l_lv_default_style);
     lv_style_set_bg_color(&l_lv_default_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lv_style_set_text_color(&l_lv_default_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_bg_color(&l_lv_default_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lv_style_set_text_color(&l_lv_default_style, LV_STATE_FOCUSED, LV_COLOR_RED);
+    lv_style_set_bg_color(&l_lv_default_style, LV_STATE_FOCUSED, LV_COLOR_BLUE);
     lv_style_set_text_font(&l_lv_default_style, 0, lv_theme_get_font_small());
 
     lv_style_init(&l_lv_tiny_style);
@@ -113,6 +122,18 @@ static int display_init()
     lv_label_set_text(l_lv_rh_label, "RH%");
     lv_obj_align(l_lv_rh_label, l_lv_rh, LV_ALIGN_OUT_TOP_LEFT, 0, 8);
 
+    l_lv_group = lv_group_create();
+    l_lv_button1 = lv_btn_create(lv_scr_act(), NULL);
+    lv_obj_align(l_lv_button1, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
+    lv_label_set_text(lv_label_create(l_lv_button1, NULL), "knapp");
+    lv_obj_add_style(l_lv_button1, LV_OBJ_PART_MAIN, &l_lv_default_style);
+    lv_group_add_obj(l_lv_group, l_lv_button1);
+
+    l_lv_button2 = lv_checkbox_create(lv_scr_act(), NULL);
+    lv_obj_align(l_lv_button2, l_lv_button1, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+    lv_checkbox_set_text(l_lv_button2, "text");
+    lv_obj_add_style(l_lv_button2, LV_OBJ_PART_MAIN, &l_lv_default_style);
+    lv_group_add_obj(l_lv_group, l_lv_button2);
 
     return 0;
 }
@@ -133,7 +154,6 @@ static int display_update(int call, float temp, float rh)
     LOG_INF("DHT22 temp: %s, RH: %s",
             log_strdup(buffer_t), log_strdup(buffer_rh));
 
-    lv_task_handler();
     return 0;
 }
 
@@ -189,12 +209,11 @@ static void input_poll()
         !gpio_pin_get(l_gpio1, GPIO_PIN_ENC2),
     };
 
-    if (state[0] && !last_state[0]) {
-        LOG_INF("Button pressed");
-    }
+    l_encoder_pressed = state[0];
 
     if (state[1] && !last_state[1]) {
-        LOG_INF("Knob %s", state[2] ? "-->" : "<--");
+        //LOG_INF("Knob %s", state[2] ? "-->" : "<--");
+        l_encoder_position += state[2] ? -1 : 1;
     }
 
     memcpy(last_state, state, sizeof(state));
@@ -214,6 +233,22 @@ static void counter_cb(const struct device *counter_dev,
     }
 
     input_poll();
+}
+
+static bool encoder_read_cb(lv_indev_drv_t *drv, lv_indev_data_t*data)
+{
+    int encoder_position = l_encoder_position;
+    static int last_encoder_position;
+
+    data->enc_diff = encoder_position - last_encoder_position;
+    data->state = l_encoder_pressed ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+
+    if (encoder_position - last_encoder_position) {
+        LOG_INF("Encoder: %d", encoder_position - last_encoder_position);
+    }
+
+    last_encoder_position = encoder_position;
+    return false;
 }
 
 static int input_init()
@@ -258,6 +293,18 @@ static int input_init()
         return 1;
     }
 
+    lv_indev_drv_t indev_drv;
+    lv_indev_drv_init(&indev_drv);
+    indev_drv.type = LV_INDEV_TYPE_ENCODER;
+    indev_drv.read_cb = encoder_read_cb;  
+    lv_indev_t *indev = lv_indev_drv_register(&indev_drv);
+    if (!indev) {
+        LOG_ERR("Failed to register input driver");
+        return 1;
+    }
+
+    lv_indev_set_group(indev, l_lv_group);
+
     return 0;
 }
 
@@ -288,53 +335,48 @@ int main(int argc, char **argv)
     int call = 0;
     float servo_duty = 0.0f;
     while (true) {
-        k_sleep(K_MSEC(1000));
-        gpio_pin_set(l_gpio0, GPIO_PIN_LED, 1);
-        k_sleep(K_MSEC(100));
-        gpio_pin_set(l_gpio0, GPIO_PIN_LED, 0);
+        k_sleep(K_MSEC(10));
+        if (!(call++ % 128)) {
+            gpio_pin_set(l_gpio0, GPIO_PIN_LED, 1);
+            if (sensor_sample_fetch(l_dht22)) {
+                LOG_ERR("Failed to fetch DHT22 sample");
+            }
+            gpio_pin_set(l_gpio0, GPIO_PIN_LED, 0);
 
-        gpio_port_value_t port0, port1;
-        gpio_port_get(l_gpio0, &port0);
-        gpio_port_get(l_gpio1, &port1);
-        LOG_INF("GPIO0: %08x %08x", port0, port1);
+            struct sensor_value temp;
+            struct sensor_value rh;
+            if (sensor_channel_get(l_dht22, SENSOR_CHAN_AMBIENT_TEMP, &temp)) {
+                LOG_ERR("Failed to read temperature");
+            }
+            if (sensor_channel_get(l_dht22, SENSOR_CHAN_HUMIDITY, &rh)) {
+                LOG_ERR("Failed to read humitidy");
+            }
 
-        if (sensor_sample_fetch(l_dht22)) {
-            LOG_ERR("Failed to fetch DHT22 sample");
-        }
+            float temp_f = sensor_value_to_double(&temp);
+            float rh_f = sensor_value_to_double(&rh);
 
-        struct sensor_value temp;
-        struct sensor_value rh;
-        if (sensor_channel_get(l_dht22, SENSOR_CHAN_AMBIENT_TEMP, &temp)) {
-            LOG_ERR("Failed to read temperature");
-        }
-        if (sensor_channel_get(l_dht22, SENSOR_CHAN_HUMIDITY, &rh)) {
-            LOG_ERR("Failed to read humitidy");
-        }
-
-        float temp_f = sensor_value_to_double(&temp);
-        float rh_f = sensor_value_to_double(&rh);
-
-        if (display_update(call, temp_f, rh_f)) {
-            return 1;
-        }
-        call++;
-
-        if (temp_f >= 27.0f) {
-            if (servo_duty != 2.0f) {
-                servo_duty = 2.0f;
-                if (servo_set(servo_duty)) {
-                    return 1;
+            if (display_update(call, temp_f, rh_f)) {
+                return 1;
+            }
+            if (temp_f >= 27.0f) {
+                if (servo_duty != 2.0f) {
+                    servo_duty = 2.0f;
+                    if (servo_set(servo_duty)) {
+                        return 1;
+                    }
+                }
+            }
+            if (temp_f < 26.0f) {
+                if (servo_duty != 1.0f) {
+                    servo_duty = 1.0f;
+                    if (servo_set(servo_duty)) {
+                        return 1;
+                    }
                 }
             }
         }
-        if (temp_f < 26.0f) {
-            if (servo_duty != 1.0f) {
-                servo_duty = 1.0f;
-                if (servo_set(servo_duty)) {
-                    return 1;
-                }
-            }
-        }
+
+        lv_task_handler();
     }
 
     return 0;
