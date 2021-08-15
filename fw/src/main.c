@@ -29,9 +29,9 @@ static lv_style_t l_lv_value_style;
 #define GPIO_PIN_LED 13
 #define GPIO_PIN_SERVO 27
 #define PWM_CHANNEL GPIO_PIN_SERVO
-#define GPIO_PIN_BUTTON 26  // "A0"
-#define GPIO_PIN_ENC1 25  // "A1"
-#define GPIO_PIN_ENC2 (34 - 32)  // "A2"
+#define GPIO_PIN_BUTTON (34 - 32)  // "A2"
+#define GPIO_PIN_ENC1   (39 - 32)  // "A3"
+#define GPIO_PIN_ENC2   (36 - 32)  // "A4"
 
 static int gpio_init()
 {
@@ -184,8 +184,8 @@ static void input_poll()
 {
     static bool last_state[3];
     const bool state[3] = {
-        !gpio_pin_get(l_gpio0, GPIO_PIN_BUTTON),
-        !gpio_pin_get(l_gpio0, GPIO_PIN_ENC1),
+        !gpio_pin_get(l_gpio1, GPIO_PIN_BUTTON),
+        !gpio_pin_get(l_gpio1, GPIO_PIN_ENC1),
         !gpio_pin_get(l_gpio1, GPIO_PIN_ENC2),
     };
 
@@ -218,13 +218,13 @@ static void counter_cb(const struct device *counter_dev,
 
 static int input_init()
 {
-    int rc = gpio_pin_configure(l_gpio0, GPIO_PIN_BUTTON, GPIO_INPUT);
+    int rc = gpio_pin_configure(l_gpio1, GPIO_PIN_BUTTON, GPIO_INPUT);
     if (rc) {
         LOG_ERR("Error configuring pin");
         return 1;
     }
 
-    rc = gpio_pin_configure(l_gpio0, GPIO_PIN_ENC1, GPIO_INPUT);
+    rc = gpio_pin_configure(l_gpio1, GPIO_PIN_ENC1, GPIO_INPUT);
     if (rc) {
         LOG_ERR("Error configuring pin");
         return 1;
