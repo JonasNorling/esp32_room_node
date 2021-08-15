@@ -3,16 +3,19 @@
 #include <drivers/sensor.h>
 #include <drivers/display.h>
 #include <drivers/pwm.h>
+#include <drivers/counter.h>
 #include <sys/byteorder.h>
 #include <lvgl.h>
 #include <math.h>
 
 LOG_MODULE_REGISTER(main);
 
+const struct device *l_gpio0 = NULL;
 const struct device *l_gpio1 = NULL;
 const struct device *l_dht22 = NULL;
 const struct device *l_display = NULL;
 const struct device *l_pwm = NULL;
+const struct device *l_counter = NULL;
 
 static lv_obj_t *l_lv_hello_world;
 static lv_obj_t *l_lv_temp;
@@ -26,18 +29,27 @@ static lv_style_t l_lv_value_style;
 #define GPIO_PIN_LED 13
 #define GPIO_PIN_SERVO 27
 #define PWM_CHANNEL GPIO_PIN_SERVO
+#define GPIO_PIN_BUTTON 26  // "A0"
+#define GPIO_PIN_ENC1 25  // "A1"
+#define GPIO_PIN_ENC2 (34 - 32)  // "A2"
 
 static int gpio_init()
 {
     int rc;
 
-    l_gpio1 = device_get_binding(DT_LABEL(DT_NODELABEL(gpio0)));
-    if (!l_gpio1) {
-        LOG_ERR("Failed to open GPIO device");
+    l_gpio0 = device_get_binding(DT_LABEL(DT_NODELABEL(gpio0)));
+    if (!l_gpio0) {
+        LOG_ERR("Failed to open GPIO0 device");
         return 1;
     }
 
-    rc = gpio_pin_configure(l_gpio1, GPIO_PIN_LED, GPIO_OUTPUT_LOW);
+    l_gpio1 = device_get_binding(DT_LABEL(DT_NODELABEL(gpio1)));
+    if (!l_gpio1) {
+        LOG_ERR("Failed to open GPIO1 device");
+        return 1;
+    }
+
+    rc = gpio_pin_configure(l_gpio0, GPIO_PIN_LED, GPIO_OUTPUT_LOW);
     if (rc) {
         LOG_ERR("Error configuring pin");
         return 1;
@@ -168,6 +180,87 @@ static int servo_set(float duty_ms)
     return 0;
 }
 
+static void input_poll()
+{
+    static bool last_state[3];
+    const bool state[3] = {
+        !gpio_pin_get(l_gpio0, GPIO_PIN_BUTTON),
+        !gpio_pin_get(l_gpio0, GPIO_PIN_ENC1),
+        !gpio_pin_get(l_gpio1, GPIO_PIN_ENC2),
+    };
+
+    if (state[0] && !last_state[0]) {
+        LOG_INF("Button pressed");
+    }
+
+    if (state[1] && !last_state[1]) {
+        LOG_INF("Knob %s", state[2] ? "-->" : "<--");
+    }
+
+    memcpy(last_state, state, sizeof(state));
+}
+
+static void counter_cb(const struct device *counter_dev,
+				       uint8_t chan_id, uint32_t ticks,
+				       void *user_data)
+{
+    const struct counter_alarm_cfg alarm_cfg = {
+        .ticks = counter_us_to_ticks(l_counter, 2000),
+        .callback = counter_cb,
+    };
+    int rc = counter_set_channel_alarm(l_counter, 0, &alarm_cfg);
+    if (rc) {
+        LOG_ERR("Error setting alarm");
+    }
+
+    input_poll();
+}
+
+static int input_init()
+{
+    int rc = gpio_pin_configure(l_gpio0, GPIO_PIN_BUTTON, GPIO_INPUT);
+    if (rc) {
+        LOG_ERR("Error configuring pin");
+        return 1;
+    }
+
+    rc = gpio_pin_configure(l_gpio0, GPIO_PIN_ENC1, GPIO_INPUT);
+    if (rc) {
+        LOG_ERR("Error configuring pin");
+        return 1;
+    }
+
+    rc = gpio_pin_configure(l_gpio1, GPIO_PIN_ENC2, GPIO_INPUT);
+    if (rc) {
+        LOG_ERR("Error configuring pin");
+        return 1;
+    }
+
+    l_counter = device_get_binding(DT_LABEL(DT_NODELABEL(timer0)));
+    if (!l_counter) {
+        LOG_ERR("Failed to open counter device");
+        return 1;
+    }
+
+    const struct counter_alarm_cfg alarm_cfg = {
+        .ticks = counter_us_to_ticks(l_counter, 500000),
+        .callback = counter_cb,
+    };
+    rc = counter_set_channel_alarm(l_counter, 0, &alarm_cfg);
+    if (rc) {
+        LOG_ERR("Error setting alarm");
+        return 1;
+    }
+
+    rc = counter_start(l_counter);
+    if (rc) {
+        LOG_ERR("Error starting counter");
+        return 1;
+    }
+
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     LOG_INF("Hello there");
@@ -188,13 +281,22 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    if (input_init()) {
+        return 1;
+    }
+
     int call = 0;
     float servo_duty = 0.0f;
     while (true) {
         k_sleep(K_MSEC(1000));
-        gpio_pin_set(l_gpio1, GPIO_PIN_LED, 1);
+        gpio_pin_set(l_gpio0, GPIO_PIN_LED, 1);
         k_sleep(K_MSEC(100));
-        gpio_pin_set(l_gpio1, GPIO_PIN_LED, 0);
+        gpio_pin_set(l_gpio0, GPIO_PIN_LED, 0);
+
+        gpio_port_value_t port0, port1;
+        gpio_port_get(l_gpio0, &port0);
+        gpio_port_get(l_gpio1, &port1);
+        LOG_INF("GPIO0: %08x %08x", port0, port1);
 
         if (sensor_sample_fetch(l_dht22)) {
             LOG_ERR("Failed to fetch DHT22 sample");
