@@ -19,7 +19,7 @@ U 1 1 6114F112
 P 3850 3500
 F 0 "A1" H 3850 2111 50  0000 C CNN
 F 1 "Adafruit_Feather_HUZZAH32_ESP32" H 3850 2020 50  0000 C CNN
-F 2 "Module:Adafruit_Feather" H 3950 2150 50  0001 L CNN
+F 2 "Module:Adafruit_Feather_WithMountingHoles" H 3950 2150 50  0001 L CNN
 F 3 "https://cdn-learn.adafruit.com/downloads/pdf/adafruit-huzzah32-esp32-feather.pdf" H 3850 2300 50  0001 C CNN
 	1    3850 3500
 	1    0    0    -1  
@@ -641,10 +641,10 @@ Wire Wire Line
 Text Label 2750 3100 0    50   ~ 0
 SERVO
 $Comp
-L Device:C C?
+L Device:C C4
 U 1 1 611D44A2
 P 6900 5450
-F 0 "C?" H 7015 5496 50  0000 L CNN
+F 0 "C4" H 7015 5496 50  0000 L CNN
 F 1 "DNP" H 7015 5405 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder" H 6938 5300 50  0001 C CNN
 F 3 "~" H 6900 5450 50  0001 C CNN
@@ -652,10 +652,10 @@ F 3 "~" H 6900 5450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Device:C C?
+L Device:C C3
 U 1 1 611D4DEC
 P 5650 5650
-F 0 "C?" H 5765 5696 50  0000 L CNN
+F 0 "C3" H 5765 5696 50  0000 L CNN
 F 1 "DNP" H 5765 5605 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder" H 5688 5500 50  0001 C CNN
 F 3 "~" H 5650 5650 50  0001 C CNN
@@ -669,10 +669,10 @@ Wire Wire Line
 Wire Wire Line
 	5650 5350 5650 5500
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0122
 U 1 1 611D9CA9
 P 6900 5700
-F 0 "#PWR?" H 6900 5450 50  0001 C CNN
+F 0 "#PWR0122" H 6900 5450 50  0001 C CNN
 F 1 "GND" H 6905 5527 50  0000 C CNN
 F 2 "" H 6900 5700 50  0001 C CNN
 F 3 "" H 6900 5700 50  0001 C CNN
@@ -680,10 +680,10 @@ F 3 "" H 6900 5700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0123
 U 1 1 611D9F3D
 P 5650 5900
-F 0 "#PWR?" H 5650 5650 50  0001 C CNN
+F 0 "#PWR0123" H 5650 5650 50  0001 C CNN
 F 1 "GND" H 5655 5727 50  0000 C CNN
 F 2 "" H 5650 5900 50  0001 C CNN
 F 3 "" H 5650 5900 50  0001 C CNN
@@ -697,10 +697,10 @@ Wire Wire Line
 Wire Wire Line
 	6900 5300 6900 5150
 $Comp
-L Device:C C?
+L Device:C C2
 U 1 1 611E1BBF
 P 5400 5650
-F 0 "C?" H 5515 5696 50  0000 L CNN
+F 0 "C2" H 5515 5696 50  0000 L CNN
 F 1 "DNP" H 5515 5605 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0402_1005Metric_Pad0.74x0.62mm_HandSolder" H 5438 5500 50  0001 C CNN
 F 3 "~" H 5400 5650 50  0001 C CNN
@@ -708,10 +708,10 @@ F 3 "~" H 5400 5650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0124
 U 1 1 611E1F01
 P 5400 5900
-F 0 "#PWR?" H 5400 5650 50  0001 C CNN
+F 0 "#PWR0124" H 5400 5650 50  0001 C CNN
 F 1 "GND" H 5405 5727 50  0000 C CNN
 F 2 "" H 5400 5900 50  0001 C CNN
 F 3 "" H 5400 5900 50  0001 C CNN
@@ -720,4 +720,260 @@ F 3 "" H 5400 5900 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	5400 5800 5400 5900
+$Comp
+L Mechanical:MountingHole H1
+U 1 1 61192192
+P 9850 2200
+F 0 "H1" H 9950 2246 50  0000 L CNN
+F 1 "MountingHole" H 9950 2155 50  0000 L CNN
+F 2 "MountingHole:MountingHole_2.5mm" H 9850 2200 50  0001 C CNN
+F 3 "~" H 9850 2200 50  0001 C CNN
+	1    9850 2200
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:MountingHole H2
+U 1 1 611927CE
+P 9850 2400
+F 0 "H2" H 9950 2446 50  0000 L CNN
+F 1 "MountingHole" H 9950 2355 50  0000 L CNN
+F 2 "MountingHole:MountingHole_2.5mm" H 9850 2400 50  0001 C CNN
+F 3 "~" H 9850 2400 50  0001 C CNN
+	1    9850 2400
+	1    0    0    -1  
+$EndComp
+$Comp
+L Graphic:Logo_Open_Hardware_Small LOGO1
+U 1 1 61197769
+P 9900 3250
+F 0 "LOGO1" H 9900 3525 50  0001 C CNN
+F 1 "Logo_Open_Hardware_Small" H 9900 3025 50  0001 C CNN
+F 2 "Symbol:OSHW-Logo_5.7x6mm_SilkScreen" H 9900 3250 50  0001 C CNN
+F 3 "~" H 9900 3250 50  0001 C CNN
+	1    9900 3250
+	1    0    0    -1  
+$EndComp
+$Comp
+L Graphic:Logo_Open_Hardware_Small LOGO2
+U 1 1 6119A56C
+P 10400 3250
+F 0 "LOGO2" H 10400 3525 50  0001 C CNN
+F 1 "Logo_Open_Hardware_Small" H 10400 3025 50  0001 C CNN
+F 2 "elemental:elemental-4mm-mask" H 10400 3250 50  0001 C CNN
+F 3 "~" H 10400 3250 50  0001 C CNN
+	1    10400 3250
+	1    0    0    -1  
+$EndComp
+$Comp
+L Graphic:Logo_Open_Hardware_Small LOGO3
+U 1 1 6119AA53
+P 10900 3250
+F 0 "LOGO3" H 10900 3525 50  0001 C CNN
+F 1 "Logo_Open_Hardware_Small" H 10900 3025 50  0001 C CNN
+F 2 "elemental:elemental-25.4mm" H 10900 3250 50  0001 C CNN
+F 3 "~" H 10900 3250 50  0001 C CNN
+	1    10900 3250
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:TestPoint TP4
+U 1 1 611D45F1
+P 2700 3300
+F 0 "TP4" V 2895 3372 50  0000 C CNN
+F 1 "TestPoint" V 2804 3372 50  0000 C CNN
+F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 2900 3300 50  0001 C CNN
+F 3 "~" H 2900 3300 50  0001 C CNN
+	1    2700 3300
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Connector:TestPoint TP5
+U 1 1 611D540C
+P 2700 3400
+F 0 "TP5" V 2895 3472 50  0000 C CNN
+F 1 "TestPoint" V 2804 3472 50  0000 C CNN
+F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 2900 3400 50  0001 C CNN
+F 3 "~" H 2900 3400 50  0001 C CNN
+	1    2700 3400
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Connector:TestPoint TP6
+U 1 1 611D55B0
+P 2700 4000
+F 0 "TP6" V 2895 4072 50  0000 C CNN
+F 1 "TestPoint" V 2804 4072 50  0000 C CNN
+F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 2900 4000 50  0001 C CNN
+F 3 "~" H 2900 4000 50  0001 C CNN
+	1    2700 4000
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Connector:TestPoint TP7
+U 1 1 611D5A3A
+P 2700 4100
+F 0 "TP7" V 2895 4172 50  0000 C CNN
+F 1 "TestPoint" V 2804 4172 50  0000 C CNN
+F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 2900 4100 50  0001 C CNN
+F 3 "~" H 2900 4100 50  0001 C CNN
+	1    2700 4100
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Connector:TestPoint TP9
+U 1 1 611D61C4
+P 5000 3400
+F 0 "TP9" V 5195 3472 50  0000 C CNN
+F 1 "TestPoint" V 5104 3472 50  0000 C CNN
+F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 5200 3400 50  0001 C CNN
+F 3 "~" H 5200 3400 50  0001 C CNN
+	1    5000 3400
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP8
+U 1 1 611D658E
+P 5000 3300
+F 0 "TP8" V 5195 3372 50  0000 C CNN
+F 1 "TestPoint" V 5104 3372 50  0000 C CNN
+F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 5200 3300 50  0001 C CNN
+F 3 "~" H 5200 3300 50  0001 C CNN
+	1    5000 3300
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP10
+U 1 1 611D8B51
+P 5000 3800
+F 0 "TP10" V 5195 3872 50  0000 C CNN
+F 1 "TestPoint" V 5104 3872 50  0000 C CNN
+F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 5200 3800 50  0001 C CNN
+F 3 "~" H 5200 3800 50  0001 C CNN
+	1    5000 3800
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	2700 3300 3350 3300
+Wire Wire Line
+	3350 3400 2700 3400
+Wire Wire Line
+	2700 4000 3350 4000
+Wire Wire Line
+	3350 4100 2700 4100
+Wire Wire Line
+	5000 3300 4350 3300
+Wire Wire Line
+	5000 3400 4350 3400
+Wire Wire Line
+	5000 3800 4350 3800
+$Comp
+L Connector:TestPoint TP2
+U 1 1 611E7418
+P 2000 3300
+F 0 "TP2" H 1942 3326 50  0000 R CNN
+F 1 "TestPoint" H 1942 3417 50  0000 R CNN
+F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 2200 3300 50  0001 C CNN
+F 3 "~" H 2200 3300 50  0001 C CNN
+	1    2000 3300
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector:TestPoint TP3
+U 1 1 611E8160
+P 2000 3700
+F 0 "TP3" H 2058 3818 50  0000 L CNN
+F 1 "TestPoint" H 2058 3727 50  0000 L CNN
+F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 2200 3700 50  0001 C CNN
+F 3 "~" H 2200 3700 50  0001 C CNN
+	1    2000 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0125
+U 1 1 611E8A1E
+P 2000 3700
+F 0 "#PWR0125" H 2000 3450 50  0001 C CNN
+F 1 "GND" H 2005 3527 50  0000 C CNN
+F 2 "" H 2000 3700 50  0001 C CNN
+F 3 "" H 2000 3700 50  0001 C CNN
+	1    2000 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3V3 #PWR0126
+U 1 1 611E934E
+P 2000 3300
+F 0 "#PWR0126" H 2000 3150 50  0001 C CNN
+F 1 "+3V3" H 2015 3473 50  0000 C CNN
+F 2 "" H 2000 3300 50  0001 C CNN
+F 3 "" H 2000 3300 50  0001 C CNN
+	1    2000 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:TestPoint TP1
+U 1 1 611E9DD3
+P 1750 3300
+F 0 "TP1" H 1692 3326 50  0000 R CNN
+F 1 "TestPoint" H 1692 3417 50  0000 R CNN
+F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 1950 3300 50  0001 C CNN
+F 3 "~" H 1950 3300 50  0001 C CNN
+	1    1750 3300
+	-1   0    0    1   
+$EndComp
+$Comp
+L power:+5V #PWR0127
+U 1 1 611EA1A4
+P 1750 3300
+F 0 "#PWR0127" H 1750 3150 50  0001 C CNN
+F 1 "+5V" H 1765 3473 50  0000 C CNN
+F 2 "" H 1750 3300 50  0001 C CNN
+F 3 "" H 1750 3300 50  0001 C CNN
+	1    1750 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:TestPoint TP?
+U 1 1 6120AC9D
+P 1750 3700
+F 0 "TP?" H 1808 3818 50  0000 L CNN
+F 1 "TestPoint" H 1808 3727 50  0000 L CNN
+F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 1950 3700 50  0001 C CNN
+F 3 "~" H 1950 3700 50  0001 C CNN
+	1    1750 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 6120B0E9
+P 1750 3700
+F 0 "#PWR?" H 1750 3450 50  0001 C CNN
+F 1 "GND" H 1755 3527 50  0000 C CNN
+F 2 "" H 1750 3700 50  0001 C CNN
+F 3 "" H 1750 3700 50  0001 C CNN
+	1    1750 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:TestPoint TP?
+U 1 1 6120D9C2
+P 1450 3700
+F 0 "TP?" H 1508 3818 50  0000 L CNN
+F 1 "TestPoint" H 1508 3727 50  0000 L CNN
+F 2 "TestPoint:TestPoint_THTPad_1.5x1.5mm_Drill0.7mm" H 1650 3700 50  0001 C CNN
+F 3 "~" H 1650 3700 50  0001 C CNN
+	1    1450 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 6120DE28
+P 1450 3700
+F 0 "#PWR?" H 1450 3450 50  0001 C CNN
+F 1 "GND" H 1455 3527 50  0000 C CNN
+F 2 "" H 1450 3700 50  0001 C CNN
+F 3 "" H 1450 3700 50  0001 C CNN
+	1    1450 3700
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
