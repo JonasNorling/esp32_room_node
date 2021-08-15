@@ -107,15 +107,19 @@ static int display_init()
 
 static int display_update(int call, float temp, float rh)
 {
-    char buffer[32] = "";
-    snprintf(buffer, sizeof(buffer), "Hello %d", call);
-    lv_label_set_text(l_lv_hello_world, buffer);
+    char buffer_count[16] = "";
+    char buffer_t[8] = "";
+    char buffer_rh[8] = "";
+    snprintf(buffer_count, sizeof(buffer_count), "Uptime %d", call);
+    snprintf(buffer_t, sizeof(buffer_t), "%.1fC", temp);
+    snprintf(buffer_rh, sizeof(buffer_rh), "%.1f%%", rh);
 
-    snprintf(buffer, sizeof(buffer), "%.1fC", temp);
-    lv_label_set_text(l_lv_temp, buffer);
+    lv_label_set_text(l_lv_hello_world, buffer_count);
+    lv_label_set_text(l_lv_temp, buffer_t);
+    lv_label_set_text(l_lv_rh, buffer_rh);
 
-    snprintf(buffer, sizeof(buffer), "%.1f%%", rh);
-    lv_label_set_text(l_lv_rh, buffer);
+    LOG_INF("DHT22 temp: %s, RH: %s",
+            log_strdup(buffer_t), log_strdup(buffer_rh));
 
     lv_task_handler();
     return 0;
@@ -205,18 +209,15 @@ int main(int argc, char **argv)
             LOG_ERR("Failed to read humitidy");
         }
 
-        LOG_INF("DHT22 temp: %.1f, RH: %.1f",
-                sensor_value_to_double(&temp),
-                sensor_value_to_double(&rh));
+        float temp_f = sensor_value_to_double(&temp);
+        float rh_f = sensor_value_to_double(&rh);
 
-        if (display_update(call,
-                           sensor_value_to_double(&temp),
-                           sensor_value_to_double(&rh))) {
+        if (display_update(call, temp_f, rh_f)) {
             return 1;
         }
         call++;
 
-        if (temp.val1 >= 27) {
+        if (temp_f >= 27.0f) {
             if (servo_duty != 2.0f) {
                 servo_duty = 2.0f;
                 if (servo_set(servo_duty)) {
@@ -224,7 +225,7 @@ int main(int argc, char **argv)
                 }
             }
         }
-        if (temp.val1 < 27) {
+        if (temp_f < 26.0f) {
             if (servo_duty != 1.0f) {
                 servo_duty = 1.0f;
                 if (servo_set(servo_duty)) {
