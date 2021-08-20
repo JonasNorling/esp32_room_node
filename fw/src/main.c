@@ -188,18 +188,6 @@ static int input_init()
         return 1;
     }
 
-    lv_indev_drv_t indev_drv;
-    lv_indev_drv_init(&indev_drv);
-    indev_drv.type = LV_INDEV_TYPE_ENCODER;
-    indev_drv.read_cb = encoder_read_cb;  
-    lv_indev_t *indev = lv_indev_drv_register(&indev_drv);
-    if (!indev) {
-        LOG_ERR("Failed to register input driver");
-        return 1;
-    }
-
-    lv_indev_set_group(indev, gui_get_lv_group());
-
     return 0;
 }
 
@@ -212,6 +200,10 @@ int main(int argc, char **argv)
     }
 
     if (sensor_init()) {
+        return 1;
+    }
+
+    if (gui_encoder_init(encoder_read_cb)) {
         return 1;
     }
 
