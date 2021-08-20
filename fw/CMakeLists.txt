@@ -5,4 +5,6 @@ project(esp32_room_node)
 
 target_sources(app PRIVATE
     src/main.c
+    src/gui.c
+    src/gui.h
 )
