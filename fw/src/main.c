@@ -15,7 +15,6 @@ static const struct device *l_gpio0 = NULL;
 static const struct device *l_gpio1 = NULL;
 static const struct device *l_dht22 = NULL;
 static const struct device *l_pwm = NULL;
-static const struct device *l_counter = NULL;
 
 static bool l_encoder_pressed;
 static int l_encoder_position;
@@ -26,6 +25,10 @@ static int l_encoder_position;
 #define GPIO_PIN_BUTTON (34 - 32)  // "A2"
 #define GPIO_PIN_ENC1   (39 - 32)  // "A3"
 #define GPIO_PIN_ENC2   (36 - 32)  // "A4"
+
+static void input_timer_cb(struct k_timer *timer_id);
+K_TIMER_DEFINE(l_input_timer, input_timer_cb, NULL);
+
 
 static int gpio_init()
 {
@@ -95,7 +98,7 @@ static int servo_set(float duty_ms)
     return 0;
 }
 
-static void input_poll()
+static void input_timer_cb(struct k_timer *timer_id)
 {
     static bool last_state[3];
     const bool state[3] = {
@@ -112,22 +115,6 @@ static void input_poll()
     }
 
     memcpy(last_state, state, sizeof(state));
-}
-
-static void counter_cb(const struct device *counter_dev,
-				       uint8_t chan_id, uint32_t ticks,
-				       void *user_data)
-{
-    const struct counter_alarm_cfg alarm_cfg = {
-        .ticks = counter_us_to_ticks(l_counter, 2000),
-        .callback = counter_cb,
-    };
-    int rc = counter_set_channel_alarm(l_counter, 0, &alarm_cfg);
-    if (rc) {
-        LOG_ERR("Error setting alarm");
-    }
-
-    input_poll();
 }
 
 static bool encoder_read_cb(lv_indev_drv_t *drv, lv_indev_data_t*data)
@@ -166,27 +153,7 @@ static int input_init()
         return 1;
     }
 
-    l_counter = device_get_binding(DT_LABEL(DT_NODELABEL(timer0)));
-    if (!l_counter) {
-        LOG_ERR("Failed to open counter device");
-        return 1;
-    }
-
-    const struct counter_alarm_cfg alarm_cfg = {
-        .ticks = counter_us_to_ticks(l_counter, 500000),
-        .callback = counter_cb,
-    };
-    rc = counter_set_channel_alarm(l_counter, 0, &alarm_cfg);
-    if (rc) {
-        LOG_ERR("Error setting alarm");
-        return 1;
-    }
-
-    rc = counter_start(l_counter);
-    if (rc) {
-        LOG_ERR("Error starting counter");
-        return 1;
-    }
+    k_timer_start(&l_input_timer, K_MSEC(5), K_MSEC(5));
 
     return 0;
 }
