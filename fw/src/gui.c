@@ -4,6 +4,7 @@
 #include <sys/byteorder.h>
 
 #include "gui.h"
+#include "config.h"
 
 LOG_MODULE_REGISTER(gui);
 
@@ -50,8 +51,16 @@ static void tile2_cb(lv_obj_t * obj, lv_event_t event)
 static void config_cb(lv_obj_t * obj, lv_event_t event)
 {
     LOG_INF("Event on %p: %u", obj, event);
-    if (event == LV_EVENT_FOCUSED) {
+    switch (event) {
+    case LV_EVENT_FOCUSED:
         lv_page_focus(l_lv_page, obj, LV_ANIM_ON);
+        break;
+    case LV_EVENT_VALUE_CHANGED:
+        if (obj == l_lv_button2) {
+            int checked = lv_checkbox_get_state(obj) == LV_BTN_STATE_CHECKED_RELEASED;
+            (void)config_set_int(CONFIG_IDX_THING, checked);
+        }
+        break;
     }
 }
 
@@ -178,6 +187,9 @@ static void init_config_page(lv_obj_t *parent)
     l_lv_button2 = lv_checkbox_create(l_lv_page, NULL);
     lv_obj_align(l_lv_button2, l_lv_button1, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
     lv_checkbox_set_text(l_lv_button2, "checkbox");
+    int checked = 0;
+    (void)config_get_int(CONFIG_IDX_THING, &checked);
+    lv_checkbox_set_checked(l_lv_button2, checked);
     lv_obj_add_style(l_lv_button2, LV_OBJ_PART_MAIN, &l_lv_default_style);
     lv_group_add_obj(l_lv_config_group, l_lv_button2);
     lv_obj_set_event_cb(l_lv_button2, config_cb);

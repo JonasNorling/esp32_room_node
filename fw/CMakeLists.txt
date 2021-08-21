@@ -7,4 +7,6 @@ target_sources(app PRIVATE
     src/main.c
     src/gui.c
     src/gui.h
+    src/config.c
+    src/config.h
 )

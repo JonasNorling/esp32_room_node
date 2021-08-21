@@ -8,6 +8,7 @@
 #include <math.h>
 
 #include "gui.h"
+#include "config.h"
 
 LOG_MODULE_REGISTER(main);
 
@@ -163,6 +164,10 @@ int main(int argc, char **argv)
     LOG_INF("Hello there");
 
     if (gpio_init()) {
+        return 1;
+    }
+
+    if (config_init()) {
         return 1;
     }
 
