@@ -8,19 +8,19 @@
 LOG_MODULE_REGISTER(config);
 
 static struct nvs_fs l_fs;
-static int l_values[CONFIG_IDX__LAST] = {
-    [CONFIG_IDX_SERVO_LEFT] = 1000,
-    [CONFIG_IDX_SERVO_RIGHT] = 2000,
+static float l_values[CONFIG_IDX__LAST] = {
+    [CONFIG_IDX_SERVO_LEFT] = 1.0,
+    [CONFIG_IDX_SERVO_RIGHT] = 2.0,
 };
 
 
-static int config_read_int(uint16_t addr, int *value)
+static int config_read_float(uint16_t addr, float *value)
 {
-    int rc = nvs_read(&l_fs, addr, value, sizeof(int));
-    return rc != sizeof(int);
+    int rc = nvs_read(&l_fs, addr, value, sizeof(*value));
+    return rc != sizeof(*value);
 }
 
-static int config_write_int(uint16_t addr, int value)
+static int config_write_float(uint16_t addr, float value)
 {
     int rc = nvs_write(&l_fs, addr, &value, sizeof(value));
     if (rc != sizeof(value)) {
@@ -33,12 +33,12 @@ static int config_write_int(uint16_t addr, int value)
 static int config_load(void)
 {
     for (int addr = 0; addr < ARRAY_SIZE(l_values); addr++) {
-        (void)config_read_int(addr, &l_values[addr]);
+        (void)config_read_float(addr, &l_values[addr]);
     }
     return 0;
 }
 
-int config_get_int(enum config_idx index, int *value)
+int config_get_float(enum config_idx index, float *value)
 {
     if (index >= ARRAY_SIZE(l_values)) {
         LOG_ERR("Get bad config index");
@@ -49,7 +49,7 @@ int config_get_int(enum config_idx index, int *value)
     return 0;
 }
 
-int config_set_int(enum config_idx index, int value)
+int config_set_float(enum config_idx index, float value)
 {
     if (index >= ARRAY_SIZE(l_values)) {
         LOG_ERR("Set bad config index");
@@ -57,7 +57,7 @@ int config_set_int(enum config_idx index, int value)
     }
 
     l_values[index] = value;
-    return config_write_int(index, value);
+    return config_write_float(index, value);
 }
 
 int config_init(void)

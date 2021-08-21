@@ -224,14 +224,10 @@ int main(int argc, char **argv)
         }
 
         if (temp_f >= 27.0f) {
-            int value_us = 0;
-            config_get_int(CONFIG_IDX_SERVO_LEFT, &value_us);
-            wanted_duty = value_us / 1000.0f;
+            config_get_float(CONFIG_IDX_SERVO_LEFT, &wanted_duty);
         }
         if (temp_f < 26.0f) {
-            int value_us = 0;
-            config_get_int(CONFIG_IDX_SERVO_RIGHT, &value_us);
-            wanted_duty = value_us / 1000.0f;
+            config_get_float(CONFIG_IDX_SERVO_RIGHT, &wanted_duty);
         }
 
         if (set_duty != wanted_duty) {
