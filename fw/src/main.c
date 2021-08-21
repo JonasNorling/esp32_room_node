@@ -154,7 +154,7 @@ static int input_init()
         return 1;
     }
 
-    k_timer_start(&l_input_timer, K_MSEC(5), K_MSEC(5));
+    k_timer_start(&l_input_timer, K_MSEC(5), K_MSEC(2));
 
     return 0;
 }
@@ -192,7 +192,11 @@ int main(int argc, char **argv)
     }
 
     int call = 0;
-    float servo_duty = 0.0f;
+    float wanted_duty = 0.0f;
+    float set_duty = 0.0f;
+    float temp_f = 0.0f;
+    float rh_f = 0.0f;
+
     while (true) {
         k_sleep(K_MSEC(10));
         if (!(call++ % 128)) {
@@ -211,27 +215,29 @@ int main(int argc, char **argv)
                 LOG_ERR("Failed to read humitidy");
             }
 
-            float temp_f = sensor_value_to_double(&temp);
-            float rh_f = sensor_value_to_double(&rh);
+            temp_f = sensor_value_to_double(&temp);
+            rh_f = sensor_value_to_double(&rh);
 
             if (gui_update(call, temp_f, rh_f)) {
                 return 1;
             }
-            if (temp_f >= 27.0f) {
-                if (servo_duty != 2.0f) {
-                    servo_duty = 2.0f;
-                    if (servo_set(servo_duty)) {
-                        return 1;
-                    }
-                }
-            }
-            if (temp_f < 26.0f) {
-                if (servo_duty != 1.0f) {
-                    servo_duty = 1.0f;
-                    if (servo_set(servo_duty)) {
-                        return 1;
-                    }
-                }
+        }
+
+        if (temp_f >= 27.0f) {
+            int value_us = 0;
+            config_get_int(CONFIG_IDX_SERVO_LEFT, &value_us);
+            wanted_duty = value_us / 1000.0f;
+        }
+        if (temp_f < 26.0f) {
+            int value_us = 0;
+            config_get_int(CONFIG_IDX_SERVO_RIGHT, &value_us);
+            wanted_duty = value_us / 1000.0f;
+        }
+
+        if (set_duty != wanted_duty) {
+            set_duty = wanted_duty;
+            if (servo_set(set_duty)) {
+                return 1;
             }
         }
 

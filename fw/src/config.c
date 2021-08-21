@@ -8,7 +8,10 @@
 LOG_MODULE_REGISTER(config);
 
 static struct nvs_fs l_fs;
-static int l_values[CONFIG_IDX__LAST];
+static int l_values[CONFIG_IDX__LAST] = {
+    [CONFIG_IDX_SERVO_LEFT] = 1000,
+    [CONFIG_IDX_SERVO_RIGHT] = 2000,
+};
 
 
 static int config_read_int(uint16_t addr, int *value)
